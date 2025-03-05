@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fwappy Burd</title>
+    <!-- App icon for mobile devices -->
+    <link rel="apple-touch-icon" href="app-icon.png">
+    <link rel="icon" type="image/png" href="app-icon.png">
+    <meta name="theme-color" content="#70c5ce">
+    <!-- Add manifest for PWA support -->
+    <link rel="manifest" href="manifest.json">
     <style>
         body {
             margin: 0;
@@ -212,7 +218,6 @@
         }
     </style>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
     <div class="game-container">
@@ -242,5 +247,50 @@
     </div>
     
     <script src="game.js"></script>
+    <script>
+        // Create app icon from sprite for APK packaging
+        window.onload = function() {
+            // After all resources are loaded
+            setTimeout(function() {
+                // Create a temporary canvas to extract the bird image
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 34;
+                tempCanvas.height = 34;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Draw a circular background
+                tempCtx.beginPath();
+                tempCtx.arc(17, 17, 17, 0, Math.PI * 2);
+                tempCtx.fillStyle = '#70c5ce';
+                tempCtx.fill();
+                
+                // Get the bird sprite from the game
+                const sprite = new Image();
+                sprite.onload = function() {
+                    // Draw the bird from the sprite sheet (using the midflap position)
+                    tempCtx.drawImage(sprite, 276, 139, 34, 26, 0, 4, 34, 26);
+                    
+                    // Convert to data URL for use as favicon
+                    const iconDataUrl = tempCanvas.toDataURL('image/png');
+                    
+                    // Create a link element for the favicon
+                    const iconLink = document.createElement('link');
+                    iconLink.rel = 'icon';
+                    iconLink.href = iconDataUrl;
+                    document.head.appendChild(iconLink);
+                    
+                    // Also create a downloadable version for APK packaging
+                    const downloadLink = document.createElement('a');
+                    downloadLink.style.display = 'none';
+                    downloadLink.href = iconDataUrl;
+                    downloadLink.download = 'app-icon.png';
+                    document.body.appendChild(downloadLink);
+                    
+                    console.log('App icon created from sprite');
+                };
+                sprite.src = 'sprite.png';
+            }, 1000);
+        };
+    </script>
 </body>
 </html>
