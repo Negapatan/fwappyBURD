@@ -14,14 +14,21 @@ let frames = 0;
 let bestScore = localStorage.getItem('bestScore') || 0;
 let gameOverTimeoutId = null;
 
+// Time-based animation variables
+let lastTime = 0;
+const FPS = 60 ;
+const timeStep = 1000 / FPS; // Time step in milliseconds (16.67ms for 60fps)
+let deltaTime = 0;
+let accumulator = 0;
+
 // Bird properties
 const bird = {
     x: 50,
     y: 150,
     width: 30,
     height: 20,
-    gravity: 0.25,
-    jump: 4.6,
+    gravity: 0.25 * (60 / FPS), // Scale gravity to the target FPS
+    jump: 4.6 * (60 / FPS),     // Scale jump to the target FPS
     velocity: 0,
     rotation: 0,
     currentFrame: 0,
@@ -45,7 +52,7 @@ const bg = {
     y: 0,
     width: 320,
     height: 480,
-    dx: 0.5  // Speed of background movement
+    dx: 0.5 * (60 / FPS)  // Scale speed to the target FPS
 };
 bg.sprite.src = 'sprites/background-day.png';
 
@@ -55,7 +62,7 @@ const fg = {
     y: canvas.height - 112,
     width: 320,
     height: 112,
-    dx: 2  // Speed of foreground movement
+    dx: 2 * (60 / FPS)  // Scale speed to the target FPS
 };
 fg.sprite.src = 'sprites/base.png';
 
@@ -71,7 +78,8 @@ const pipes = {
     width: 52,
     height: 320,
     gap: 120,
-    dx: 2
+    dx: 2 * (60 / FPS),  // Scale speed to the target FPS
+    spawnInterval: 100 * (FPS / 60)  // Scale spawn interval to the target FPS
 };
 pipes.top.sprite.src = 'sprites/pipe-green.png';
 pipes.bottom.sprite.src = 'sprites/pipe-green.png';
@@ -207,7 +215,8 @@ function startGame() {
     gameStarted = true;
     gameOver = false;
     startScreen.style.display = 'none';
-    loop();
+    lastTime = performance.now();
+    loop(lastTime);
 }
 
 function resetGame() {
@@ -230,9 +239,14 @@ function resetGame() {
     // Reset game state
     gameOver = false;
     gameOverScreen.style.display = 'none';
+    frames = 0;
+    
+    // Reset time variables
+    lastTime = performance.now();
+    accumulator = 0;
     
     // Start the game loop
-    loop();
+    loop(lastTime);
 }
 
 function flap() {
@@ -244,8 +258,11 @@ function flap() {
     sounds.flap.play().catch(e => console.log("Error playing flap sound:", e));
 }
 
-function update() {
+function update(dt) {
     if (gameOver) return;
+    
+    // Increment frames counter (scaled to time)
+    frames++;
     
     // Bird movement
     bird.velocity += bird.gravity;
@@ -293,8 +310,8 @@ function update() {
     // Move background slightly slower
     bg.x = (bg.x - bg.dx) % (bg.width / 2);
     
-    // Add new pipes every 100 frames
-    if (frames % 100 === 0) {
+    // Add new pipes every spawnInterval frames
+    if (frames % pipes.spawnInterval === 0) {
         // Calculate the gap position (centered in the canvas height minus foreground)
         const gapPosition = Math.floor(Math.random() * (canvas.height - fg.height - pipes.gap - 120)) + 60;
         
@@ -393,7 +410,6 @@ function update() {
     }
     
     // Update bird animation frame
-    frames++;
     if (frames % bird.period === 0) {
         bird.currentFrame = (bird.currentFrame + 1) % bird.animation.length;
     }
@@ -459,18 +475,29 @@ function drawScore() {
     }
 }
 
-function drawGameOverScore() {
-    const scoreStr = score.toString();
-    const bestScoreStr = bestScore.toString();
-    const width = 24; // Width of each digit
+function loop(currentTime) {
+    // Calculate time elapsed since last frame
+    deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
     
-    // Don't draw the game over image here, let the HTML handle it
-}
-
-function loop() {
-    update();
+    // Prevent spiral of death with large deltaTime (e.g., when tab is inactive)
+    if (deltaTime > 200) {
+        deltaTime = timeStep;
+    }
+    
+    // Accumulate time since last update
+    accumulator += deltaTime;
+    
+    // Update game logic in fixed time steps
+    while (accumulator >= timeStep) {
+        update(timeStep);
+        accumulator -= timeStep;
+    }
+    
+    // Draw the game
     draw();
     
+    // Continue the game loop if not game over
     if (!gameOver) {
         requestAnimationFrame(loop);
     }
