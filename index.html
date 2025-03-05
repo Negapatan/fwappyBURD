@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird</title>
+    <title>Fwappy Burd</title>
     <style>
         body {
             margin: 0;
@@ -13,14 +13,189 @@
             align-items: center;
             height: 100vh;
             background-color: #f7f7f7;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .game-container {
+            position: relative;
+            width: 288px;
+            height: 512px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
         }
         
         canvas {
-            border: 1px solid #000;
             max-width: 100%;
             max-height: 100vh;
             display: block;
             margin: 0 auto;
+        }
+        
+        #start-screen, #game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            backdrop-filter: blur(3px);
+        }
+        
+        #game-over {
+            display: none;
+        }
+        
+        .button {
+            padding: 12px 24px;
+            margin: 15px;
+            background-color: #f1c40f;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .button:hover {
+            background-color: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-container {
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+        }
+        
+        .title {
+            color: white;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+        }
+        
+        .difficulty-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            width: 80%;
+        }
+        
+        .difficulty-label {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .difficulty-buttons {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .difficulty-button {
+            padding: 10px 0;
+            margin: 0 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            max-width: 80px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .difficulty-button::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #fff;
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .difficulty-button:hover::after {
+            transform: scaleX(1);
+        }
+        
+        .difficulty-button.selected {
+            background-color: #2980b9;
+            font-weight: bold;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .difficulty-button.selected::after {
+            transform: scaleX(1);
+        }
+        
+        .difficulty-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .difficulty-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        #easy-button {
+            background-color: #2ecc71;
+        }
+        
+        #easy-button.selected, #easy-button:hover {
+            background-color: #27ae60;
+        }
+        
+        #medium-button {
+            background-color: #f39c12;
+        }
+        
+        #medium-button.selected, #medium-button:hover {
+            background-color: #e67e22;
+        }
+        
+        #hard-button {
+            background-color: #e74c3c;
+        }
+        
+        #hard-button.selected, #hard-button:hover {
+            background-color: #c0392b;
         }
         
         @media (max-width: 768px) {
@@ -29,39 +204,43 @@
                 width: 100%;
                 height: auto;
             }
+            
+            .difficulty-button {
+                font-size: 14px;
+                padding: 8px 0;
+            }
         }
     </style>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
-    <div class="container">
-        <div class="game-container">
-            <canvas id="game-canvas" width="320" height="480"></canvas>
-            <div id="start-screen">
-                <img src="sprites/message.png" alt="Get Ready">
-                <button id="start-button">Start Game</button>
-                <p class="controls-hint">Press SPACE or tap to start and flap</p>
-            </div>
-            <div id="game-over">
-                <img src="sprites/gameover.png" alt="Game Over">
-                <div class="score-container">
-                    <div class="score-panel">
-                        <div class="score-row">
-                            <span class="score-label">Score:</span>
-                            <span id="current-score" class="score-value">0</span>
-                        </div>
-                        <div class="score-row">
-                            <span class="score-label">Best:</span>
-                            <span id="best-score" class="score-value">0</span>
-                        </div>
-                    </div>
+    <div class="game-container">
+        <canvas id="canvas" width="288" height="512"></canvas>
+        
+        <div id="start-screen">
+            <div class="title">Fwappy Burd</div>
+            <div class="difficulty-container">
+                <div class="difficulty-label">Select Difficulty:</div>
+                <div class="difficulty-buttons">
+                    <button id="easy-button" class="difficulty-button selected">Easy</button>
+                    <button id="medium-button" class="difficulty-button">Medium</button>
+                    <button id="hard-button" class="difficulty-button">Hard</button>
                 </div>
-                <button id="restart-button">Play Again</button>
-                <p class="controls-hint">Press SPACE or tap to play again</p>
             </div>
+            <button id="start-button" class="button">Start Game</button>
+        </div>
+        
+        <div id="game-over">
+            <div class="title">Game Over</div>
+            <div class="score-container">
+                <div>Score: <span id="current-score">0</span></div>
+                <div>Best: <span id="best-score">0</span></div>
+            </div>
+            <button id="restart-button" class="button">Play Again</button>
         </div>
     </div>
+    
     <script src="game.js"></script>
 </body>
 </html>

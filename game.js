@@ -1,10 +1,77 @@
 // Game variables
-const canvas = document.getElementById('game-canvas');
+const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
 const gameOverScreen = document.getElementById('game-over');
 const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
+
+// Difficulty settings
+const DIFFICULTY = {
+    EASY: {
+        pipeGap: 120,
+        pipeSpeed: 2 * (60 / 60),
+        spawnInterval: 100
+    },
+    MEDIUM: {
+        pipeGap: 90,
+        pipeSpeed: 2.5 * (60 / 60),
+        spawnInterval: 90
+    },
+    HARD: {
+        pipeGap: 70,
+        pipeSpeed: 2 * (60 / 60),
+        spawnInterval: 110
+    }
+};
+
+// Current difficulty
+let currentDifficulty = DIFFICULTY.EASY;
+
+// Difficulty buttons
+const easyButton = document.getElementById('easy-button');
+const mediumButton = document.getElementById('medium-button');
+const hardButton = document.getElementById('hard-button');
+
+// Add event listeners for difficulty buttons
+easyButton.addEventListener('click', () => {
+    setDifficulty('EASY');
+});
+
+mediumButton.addEventListener('click', () => {
+    setDifficulty('MEDIUM');
+});
+
+hardButton.addEventListener('click', () => {
+    setDifficulty('HARD');
+});
+
+// Function to set difficulty
+function setDifficulty(level) {
+    // Remove selected class from all buttons
+    easyButton.classList.remove('selected');
+    mediumButton.classList.remove('selected');
+    hardButton.classList.remove('selected');
+    
+    // Set current difficulty
+    currentDifficulty = DIFFICULTY[level];
+    
+    // Update pipe settings
+    pipes.gap = currentDifficulty.pipeGap;
+    pipes.dx = currentDifficulty.pipeSpeed;
+    pipes.spawnInterval = currentDifficulty.spawnInterval;
+    
+    // Add selected class to the chosen button
+    if (level === 'EASY') {
+        easyButton.classList.add('selected');
+    } else if (level === 'MEDIUM') {
+        mediumButton.classList.add('selected');
+    } else if (level === 'HARD') {
+        hardButton.classList.add('selected');
+    }
+    
+    console.log(`Difficulty set to ${level}: gap=${pipes.gap}, speed=${pipes.dx}, spawn=${pipes.spawnInterval}`);
+}
 
 // Game state
 let gameStarted = false;
@@ -16,7 +83,7 @@ let gameOverTimeoutId = null;
 
 // Time-based animation variables
 let lastTime = 0;
-const FPS = 60 ;
+const FPS = 60;
 const timeStep = 1000 / FPS; // Time step in milliseconds (16.67ms for 60fps)
 let deltaTime = 0;
 let accumulator = 0;
@@ -212,6 +279,10 @@ function resizeGame() {
 
 // Game functions
 function startGame() {
+    console.log("Starting game with difficulty:", 
+                easyButton.classList.contains('selected') ? "EASY" : 
+                mediumButton.classList.contains('selected') ? "MEDIUM" : "HARD");
+    
     gameStarted = true;
     gameOver = false;
     startScreen.style.display = 'none';
@@ -239,14 +310,13 @@ function resetGame() {
     // Reset game state
     gameOver = false;
     gameOverScreen.style.display = 'none';
+    startScreen.style.display = 'flex'; // Show start screen again
     frames = 0;
+    gameStarted = false;
     
     // Reset time variables
     lastTime = performance.now();
     accumulator = 0;
-    
-    // Start the game loop
-    loop(lastTime);
 }
 
 function flap() {
@@ -369,7 +439,7 @@ function update(dt) {
         if (
             bird.x + bird.width > p.x &&
             bird.x < p.x + pipes.width &&
-            bird.y + bird.height > p.y + pipes.gap
+            bird.y + bird.height > bottomPipeY
         ) {
             gameOver = true;
             
@@ -467,7 +537,7 @@ function drawScore() {
     const x = canvas.width / 2 - (scoreStr.length * width) / 2;
     
     // Always draw current score at the top during gameplay
-    if (!gameOver) {
+    if (!gameOver && gameStarted) {
         for (let i = 0; i < scoreStr.length; i++) {
             const digit = parseInt(scoreStr[i]);
             ctx.drawImage(digits[digit], x + i * width, 50, width, 36);
@@ -498,13 +568,16 @@ function loop(currentTime) {
     draw();
     
     // Continue the game loop if not game over
-    if (!gameOver) {
+    if (!gameOver && gameStarted) {
         requestAnimationFrame(loop);
     }
 }
 
 // Initialize the game when the window loads
 window.onload = function() {
+    // Set initial difficulty
+    setDifficulty('EASY');
+    
     // Preload sounds
     preloadSounds();
     
@@ -533,4 +606,10 @@ window.onload = function() {
             }
         };
     });
+    
+    // Add console logs for debugging
+    console.log("Game initialized");
+    console.log("Canvas:", canvas);
+    console.log("Start button:", startButton);
+    console.log("Difficulty buttons:", easyButton, mediumButton, hardButton);
 };
