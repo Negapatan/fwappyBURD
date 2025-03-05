@@ -544,17 +544,22 @@
             startButton.addEventListener('click', function() {
                 hideLoadingPoint();
                 
-                // Randomize background when game starts
+                // Always randomize background when game starts, regardless of character selection
                 randomizeBackground();
+                
+                console.log("Game started - background randomized");
             });
             
             // Reset randomizer when restarting the game
             const restartButton = document.getElementById('restart-button');
             restartButton.addEventListener('click', function() {
+                // Always reset the randomizer for character if random button is selected
                 resetRandomizer();
                 
-                // Randomize background when game restarts
+                // Always randomize background when game restarts, regardless of character selection
                 randomizeBackground();
+                
+                console.log("Game restarted - background randomized");
             });
             
             // Function to reset the randomizer if random button is selected
@@ -591,11 +596,8 @@
                     // Update character but keep the random button selected
                     updateCharacter(randomCharacter, randomBirdButton, true);
                     
-                    console.log("Randomizer reset on game restart");
+                    console.log("Randomizer reset on game restart - new character selected");
                 }
-                
-                // Always randomize background regardless of character selection
-                randomizeBackground();
             }
             
             // Add space key listener to reset randomizer and randomize background
@@ -604,18 +606,26 @@
                 if (event.keyCode === 32 || event.code === 'Space') {
                     // If game hasn't started yet, start it with space
                     if (!gameStarted && !gameOver) {
-                        // Randomize background when starting with space key
+                        // Always randomize background when starting with space key
                         randomizeBackground();
+                        
                         // Simulate clicking the start button
                         startButton.click();
+                        
+                        console.log("Game started with space key - background randomized");
                     }
                     // Only reset if game-over screen is visible (game has ended)
                     else if (gameOver && gameOverScreen.style.display === 'flex') {
-                        // Reset randomizer for character selection
+                        // Reset randomizer for character selection if random button is selected
                         resetRandomizer();
+                        
+                        // Always randomize background when restarting with space key
+                        randomizeBackground();
                         
                         // Restart button click will handle the game restart
                         restartButton.click();
+                        
+                        console.log("Game restarted with space key - background randomized");
                     }
                 }
             });
@@ -661,17 +671,55 @@
             function randomizeBackground() {
                 // 50% chance for each background
                 const isNight = Math.random() < 0.5;
+                
+                // Use absolute paths to ensure proper loading on all devices
                 const backgroundFile = isNight ? 'sprites/background-night.png' : 'sprites/background-day.png';
                 
-                // Dispatch event to change background in game.js
-                window.dispatchEvent(new CustomEvent('changeBackground', {
-                    detail: { 
-                        backgroundFile: backgroundFile,
-                        isNight: isNight
-                    }
-                }));
+                console.log("Randomizing background: " + (isNight ? "night" : "day"));
                 
-                console.log(`Background randomized: ${isNight ? 'night' : 'day'} background`);
+                // Try both methods for maximum compatibility
+                
+                // Method 1: Use custom event
+                try {
+                    window.dispatchEvent(new CustomEvent('changeBackground', {
+                        detail: { 
+                            backgroundFile: backgroundFile,
+                            isNight: isNight
+                        }
+                    }));
+                } catch (error) {
+                    console.error("Error dispatching background change event:", error);
+                }
+                
+                // Method 2: Use direct function call (as fallback for mobile)
+                try {
+                    // Check if the direct function is available (it will be after game.js loads)
+                    if (typeof window.changeGameBackground === 'function') {
+                        window.changeGameBackground(backgroundFile, isNight);
+                    }
+                } catch (error) {
+                    console.error("Error using direct background change method:", error);
+                }
+                
+                // Method 3: Direct image replacement (ultimate fallback)
+                try {
+                    // Try to directly update the background sprite in the game object
+                    if (window.bg && window.bg.sprite) {
+                        const newBg = new Image();
+                        newBg.onload = function() {
+                            window.bg.sprite = newBg;
+                            console.log("Direct sprite replacement successful");
+                            
+                            // Force redraw if possible
+                            if (typeof window.draw === 'function' && (!window.gameStarted || window.gameOver)) {
+                                window.draw();
+                            }
+                        };
+                        newBg.src = backgroundFile;
+                    }
+                } catch (error) {
+                    console.error("Error with direct sprite replacement:", error);
+                }
             }
         };
     </script>

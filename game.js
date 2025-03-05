@@ -675,6 +675,34 @@ window.onload = function() {
         };
     });
     
+    // Expose a global function to change background directly
+    window.changeGameBackground = function(backgroundFile, isNight) {
+        console.log("Direct background change called:", backgroundFile);
+        
+        // Create a new image object
+        const newBg = new Image();
+        
+        // Set up onload handler before setting src
+        newBg.onload = function() {
+            // Update the background image
+            bg.sprite = newBg;
+            console.log("Background successfully changed to: " + backgroundFile);
+            
+            // Force a redraw to show the new background immediately
+            if (!gameStarted || gameOver) {
+                draw();
+            }
+        };
+        
+        // Add error handling
+        newBg.onerror = function(e) {
+            console.error("Failed to load background image: " + backgroundFile, e);
+        };
+        
+        // Set the source to trigger loading
+        newBg.src = backgroundFile;
+    };
+    
     // Add console logs for debugging
     console.log("Game initialized");
     console.log("Canvas:", canvas);
@@ -705,15 +733,16 @@ window.addEventListener('changeBirdColor', function(e) {
 window.addEventListener('changeBackground', function(event) {
     const { backgroundFile, isNight } = event.detail;
     
-    // Load the new background image
-    const newBg = new Image();
-    newBg.src = backgroundFile;
+    console.log(`Received background change event: ${backgroundFile}, isNight: ${isNight}`);
     
-    // When the image is loaded, update the background
+    // Create a new image object
+    const newBg = new Image();
+    
+    // Set up onload handler before setting src
     newBg.onload = function() {
         // Update the background image
         bg.sprite = newBg;
-        console.log("Background successfully changed");
+        console.log("Background successfully changed to: " + backgroundFile);
         
         // Force a redraw to show the new background immediately
         if (!gameStarted || gameOver) {
@@ -722,9 +751,19 @@ window.addEventListener('changeBackground', function(event) {
     };
     
     // Add error handling
-    newBg.onerror = function() {
-        console.error("Failed to load background image");
+    newBg.onerror = function(e) {
+        console.error("Failed to load background image: " + backgroundFile, e);
     };
+    
+    // Set the source to trigger loading
+    newBg.src = backgroundFile;
+    
+    // For debugging - log all current sprites
+    console.log("Current sprites:", {
+        background: bg.sprite.src,
+        foreground: fg.sprite.src,
+        birdColor: bird.color
+    });
 });
 
 // Find the score update code in your game.js and add this:
