@@ -593,6 +593,9 @@
                     
                     console.log("Randomizer reset on game restart");
                 }
+                
+                // Always randomize background regardless of character selection
+                randomizeBackground();
             }
             
             // Add space key listener to reset randomizer and randomize background
@@ -608,12 +611,10 @@
                     }
                     // Only reset if game-over screen is visible (game has ended)
                     else if (gameOver && gameOverScreen.style.display === 'flex') {
+                        // Reset randomizer for character selection
                         resetRandomizer();
                         
-                        // Randomize background when restarting with space key
-                        randomizeBackground();
-                        
-                        // Also simulate clicking the restart button to restart the game
+                        // Restart button click will handle the game restart
                         restartButton.click();
                     }
                 }
@@ -670,7 +671,7 @@
                     }
                 }));
                 
-                console.log("Background randomized (50/50 chance)");
+                console.log(`Background randomized: ${isNight ? 'night' : 'day'} background`);
             }
         };
     </script>
