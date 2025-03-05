@@ -132,6 +132,17 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Add touch event listeners for mobile
+canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault(); // Prevent scrolling when touching the canvas
+    if (!gameStarted && !gameOver) {
+        startGame();
+    } else if (gameStarted && !gameOver) {
+        flap();
+    }
+}, { passive: false });
+
+// Keep the click event for desktop
 canvas.addEventListener('click', function() {
     if (!gameStarted && !gameOver) {
         startGame();
@@ -140,8 +151,56 @@ canvas.addEventListener('click', function() {
     }
 });
 
+// Add touch events for buttons
+startButton.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    startGame();
+}, { passive: false });
+
+restartButton.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    resetGame();
+}, { passive: false });
+
+// Keep the click events for desktop
 startButton.addEventListener('click', startGame);
 restartButton.addEventListener('click', resetGame);
+
+// Handle window resize
+window.addEventListener('resize', resizeGame);
+
+// Function to handle game resizing
+function resizeGame() {
+    // Get the dimensions of the viewport
+    const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
+    
+    // Get the game container
+    const gameContainer = document.querySelector('.game-container');
+    
+    // Determine the game size while maintaining aspect ratio
+    let gameWidth = 320;
+    let gameHeight = 480;
+    
+    // Calculate the maximum dimensions that fit in the viewport
+    const maxWidth = Math.min(viewport.width, viewport.height * (320/480));
+    const maxHeight = Math.min(viewport.height, viewport.width * (480/320));
+    
+    // Set the game dimensions
+    if (maxWidth / maxHeight > 320 / 480) {
+        gameWidth = maxHeight * (320/480);
+        gameHeight = maxHeight;
+    } else {
+        gameWidth = maxWidth;
+        gameHeight = maxWidth * (480/320);
+    }
+    
+    // Apply the new dimensions
+    gameContainer.style.width = `${gameWidth}px`;
+    gameContainer.style.height = `${gameHeight}px`;
+}
 
 // Game functions
 function startGame() {
@@ -436,6 +495,9 @@ window.onload = function() {
         img.onload = () => {
             loadedImages++;
             if (loadedImages === allImages.length) {
+                // Initial resize
+                resizeGame();
+                
                 // Draw initial screen
                 draw();
                 
