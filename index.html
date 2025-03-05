@@ -29,6 +29,7 @@
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             border-radius: 10px;
+            background-color: #5f9ea0; /* Teal background color */
         }
         
         canvas {
@@ -48,9 +49,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: #5f9ea0; /* Teal background color */
             z-index: 10;
-            backdrop-filter: blur(3px);
         }
         
         #game-over {
@@ -69,6 +69,8 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 150px;
+            text-align: center;
         }
         
         .button:hover {
@@ -86,7 +88,7 @@
             margin-bottom: 20px;
             text-align: center;
             color: white;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.3);
             padding: 15px 25px;
             border-radius: 10px;
             font-size: 18px;
@@ -94,40 +96,41 @@
         
         .title {
             color: white;
-            font-size: 32px;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             font-weight: bold;
         }
         
-        .difficulty-container {
+        .difficulty-container, .character-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 15px;
             background-color: rgba(255, 255, 255, 0.1);
             padding: 15px;
             border-radius: 15px;
             width: 80%;
         }
         
-        .difficulty-label {
+        .difficulty-label, .character-label {
             color: white;
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 15px;
             font-weight: bold;
         }
         
-        .difficulty-buttons {
+        .difficulty-buttons, .character-buttons {
             display: flex;
             justify-content: center;
             width: 100%;
+            position: relative;
+            margin-bottom: 15px;
         }
         
         .difficulty-button {
             padding: 10px 0;
             margin: 0 5px;
-            background-color: #3498db;
             color: white;
             border: none;
             border-radius: 8px;
@@ -139,57 +142,98 @@
             text-align: center;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
+        }
+        
+        .character-button {
+            padding: 5px;
+            margin: 0 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 3px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .character-button img {
+            width: 34px;
+            height: 24px;
+            object-fit: contain;
+        }
+        
+        .character-button.selected {
+            border-color: #f1c40f;
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .character-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .random-button {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.2);
             overflow: hidden;
+            background: linear-gradient(135deg, #3498db, #9b59b6, #e74c3c, #f1c40f);
+            background-size: 300% 300%;
+            animation: gradient-shift 8s ease infinite;
         }
         
-        .difficulty-button::after {
-            content: '';
+        .random-button img {
+            opacity: 0.5;
+            display: none;
+        }
+        
+        .random-icon {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: #fff;
-            transform: scaleX(0);
-            transition: transform 0.3s;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
         
-        .difficulty-button:hover::after {
-            transform: scaleX(1);
+        .random-button.selected .random-icon {
+            color: #ffffff;
+            animation: spin 2s linear infinite;
+        }
+        
+        .random-button:hover .random-icon {
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
         
         .difficulty-button.selected {
-            background-color: #2980b9;
             font-weight: bold;
             transform: translateY(-3px);
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .difficulty-button.selected::after {
-            transform: scaleX(1);
-        }
-        
-        .difficulty-button:hover {
-            background-color: #2980b9;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-        }
-        
-        .difficulty-button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        #easy-button {
-            background-color: #2ecc71;
-        }
-        
-        #easy-button.selected, #easy-button:hover {
-            background-color: #27ae60;
-        }
-        
-        #medium-button {
-            background-color: #f39c12;
         }
         
         #medium-button.selected, #medium-button:hover {
@@ -204,6 +248,49 @@
             background-color: #c0392b;
         }
         
+        /* Loading point indicator styles */
+        .loading-point {
+            position: absolute;
+            bottom: 20px; /* Position at bottom of screen */
+            left: 20px; /* Position at left of screen */
+            transition: all 0.3s ease;
+            z-index: 100;
+            pointer-events: none;
+            display: block;
+            width: 40px; /* Increased size for better visibility */
+            height: 40px; /* Increased size for better visibility */
+            background-image: url('point.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: transparent;
+        }
+        
+        .loading-point img {
+            width: auto;
+            height: auto;
+            max-width: 30px;
+            max-height: 30px;
+            display: block;
+        }
+        
+        /* Difficulty info box */
+        .difficulty-info {
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 240px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
         @media (max-width: 768px) {
             /* Tablet and phone styles */
             canvas {
@@ -216,21 +303,57 @@
                 padding: 8px 0;
             }
         }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
     </style>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
+        <div class="game-container">
         <canvas id="canvas" width="288" height="512"></canvas>
         
-        <div id="start-screen">
+            <div id="start-screen">
             <div class="title">Fwappy Burd</div>
+            
+            <!-- Character Selection -->
+            <div class="character-container">
+                <div class="character-label">Select Character:</div>
+                <div class="character-buttons">
+                    <button id="yellow-bird-button" class="character-button selected">
+                        <img src="sprites/yellowbird-midflap.png" alt="Yellow Bird">
+                    </button>
+                    <button id="red-bird-button" class="character-button">
+                        <img src="sprites/redbird-midflap.png" alt="Red Bird">
+                    </button>
+                    <button id="blue-bird-button" class="character-button">
+                        <img src="sprites/bluebird-midflap.png" alt="Blue Bird">
+                    </button>
+                    <button id="random-bird-button" class="character-button random-button" title="Random: Yellow (60%), Red (20%), Blue (20%)">
+                        <div class="random-icon">?</div>
+                    </button>
+                </div>
+            </div>
+            
             <div class="difficulty-container">
                 <div class="difficulty-label">Select Difficulty:</div>
                 <div class="difficulty-buttons">
                     <button id="easy-button" class="difficulty-button selected">Easy</button>
                     <button id="medium-button" class="difficulty-button">Medium</button>
                     <button id="hard-button" class="difficulty-button">Hard</button>
+                    <div id="loading-point" class="loading-point"></div>
+                        </div>
+                <div id="difficulty-info" class="difficulty-info">
+                    Standard speed and wide pipe gaps. Perfect for beginners!
                 </div>
             </div>
             <button id="start-button" class="button">Start Game</button>
@@ -287,9 +410,268 @@
                     document.body.appendChild(downloadLink);
                     
                     console.log('App icon created from sprite');
+                    
+                    // Test the background randomization
+                    setTimeout(function() {
+                        console.log("Testing background randomization...");
+                        randomizeBackground();
+                    }, 1000);
                 };
                 sprite.src = 'sprite.png';
             }, 1000);
+            
+            // Set up difficulty selection with loading point
+            const easyButton = document.getElementById('easy-button');
+            const mediumButton = document.getElementById('medium-button');
+            const hardButton = document.getElementById('hard-button');
+            const loadingPoint = document.getElementById('loading-point');
+            const difficultyInfo = document.getElementById('difficulty-info');
+            const startButton = document.getElementById('start-button');
+            
+            // Character selection buttons
+            const yellowBirdButton = document.getElementById('yellow-bird-button');
+            const redBirdButton = document.getElementById('red-bird-button');
+            const blueBirdButton = document.getElementById('blue-bird-button');
+            const randomBirdButton = document.getElementById('random-bird-button');
+            
+            // No need to try loading the image - we're using it directly in CSS
+            
+            // Show the loading point for the initially selected button
+            setTimeout(() => {
+                showLoadingPoint(easyButton);
+            }, 300);
+            
+            // Difficulty descriptions
+            const difficultyDescriptions = {
+                easy: "Standard speed and wide pipe gaps. Perfect for beginners!",
+                medium: "Faster speed and narrower pipe gaps. A good challenge!",
+                hard: "Slower speed but very tight pipe gaps. Test your precision!"
+            };
+            
+            // Update loading point position and info when difficulty is selected
+            easyButton.addEventListener('click', function() {
+                updateDifficulty('easy', easyButton);
+                showLoadingPoint(easyButton);
+            });
+            
+            mediumButton.addEventListener('click', function() {
+                updateDifficulty('medium', mediumButton);
+                showLoadingPoint(mediumButton);
+            });
+            
+            hardButton.addEventListener('click', function() {
+                updateDifficulty('hard', hardButton);
+                showLoadingPoint(hardButton);
+            });
+            
+            // Character selection event listeners
+            yellowBirdButton.addEventListener('click', function() {
+                updateCharacter('yellow', yellowBirdButton);
+            });
+            
+            redBirdButton.addEventListener('click', function() {
+                updateCharacter('red', redBirdButton);
+            });
+            
+            blueBirdButton.addEventListener('click', function() {
+                updateCharacter('blue', blueBirdButton);
+            });
+            
+            randomBirdButton.addEventListener('click', function() {
+                // Weighted random selection with specific percentages:
+                // yellow - 60%, red - 20%, blue - 20%
+                const characters = [
+                    { color: 'yellow', weight: 60 },
+                    { color: 'red', weight: 20 },
+                    { color: 'blue', weight: 20 }
+                ];
+                
+                // Calculate total weight
+                const totalWeight = characters.reduce((sum, char) => sum + char.weight, 0);
+                
+                // Generate a random number between 0 and total weight
+                const random = Math.random() * totalWeight;
+                
+                // Find the character based on the random value and weights
+                let weightSum = 0;
+                let randomCharacter = 'yellow'; // Default fallback
+                
+                for (const char of characters) {
+                    weightSum += char.weight;
+                    if (random <= weightSum) {
+                        randomCharacter = char.color;
+                        break;
+                    }
+                }
+                
+                // Update character but keep the random button selected
+                updateCharacter(randomCharacter, randomBirdButton, true);
+                
+                // Just log to console for debugging
+                console.log(`Random character selected: ${randomCharacter} (${
+                    characters.find(c => c.color === randomCharacter).weight
+                }% chance)`);
+            });
+            
+            // Function to update character selection
+            function updateCharacter(color, button, isRandom = false) {
+                // Remove selected class from all buttons
+                yellowBirdButton.classList.remove('selected');
+                redBirdButton.classList.remove('selected');
+                blueBirdButton.classList.remove('selected');
+                randomBirdButton.classList.remove('selected');
+                
+                // Add selected class to the clicked button
+                button.classList.add('selected');
+                
+                // Update the bird color in the game
+                window.dispatchEvent(new CustomEvent('changeBirdColor', {
+                    detail: { 
+                        color: color,
+                        isRandom: isRandom 
+                    }
+                }));
+                
+                // Only log to console for debugging
+                if (!isRandom) {
+                    console.log(`Bird color set to ${color}`);
+                } else {
+                    console.log(`Random bird selected (actual color hidden)`);
+                }
+            }
+            
+            // Hide loading point when game starts
+            startButton.addEventListener('click', function() {
+                hideLoadingPoint();
+                
+                // Randomize background when game starts
+                randomizeBackground();
+            });
+            
+            // Reset randomizer when restarting the game
+            const restartButton = document.getElementById('restart-button');
+            restartButton.addEventListener('click', function() {
+                resetRandomizer();
+                
+                // Randomize background when game restarts
+                randomizeBackground();
+            });
+            
+            // Function to reset the randomizer if random button is selected
+            function resetRandomizer() {
+                // If random button is selected, trigger a new random selection
+                if (randomBirdButton.classList.contains('selected')) {
+                    // Don't need to click the button again, just run the randomization functions
+                    
+                    // Randomize character
+                    const characters = [
+                        { color: 'yellow', weight: 60 },
+                        { color: 'red', weight: 20 },
+                        { color: 'blue', weight: 20 }
+                    ];
+                    
+                    // Calculate total weight
+                    const totalWeight = characters.reduce((sum, char) => sum + char.weight, 0);
+                    
+                    // Generate a random number between 0 and total weight
+                    const random = Math.random() * totalWeight;
+                    
+                    // Find the character based on the random value and weights
+                    let weightSum = 0;
+                    let randomCharacter = 'yellow'; // Default fallback
+                    
+                    for (const char of characters) {
+                        weightSum += char.weight;
+                        if (random <= weightSum) {
+                            randomCharacter = char.color;
+                            break;
+                        }
+                    }
+                    
+                    // Update character but keep the random button selected
+                    updateCharacter(randomCharacter, randomBirdButton, true);
+                    
+                    console.log("Randomizer reset on game restart");
+                }
+            }
+            
+            // Add space key listener to reset randomizer and randomize background
+            document.addEventListener('keydown', function(event) {
+                // Check if it's the space key (keyCode 32)
+                if (event.keyCode === 32 || event.code === 'Space') {
+                    // If game hasn't started yet, start it with space
+                    if (!gameStarted && !gameOver) {
+                        // Randomize background when starting with space key
+                        randomizeBackground();
+                        // Simulate clicking the start button
+                        startButton.click();
+                    }
+                    // Only reset if game-over screen is visible (game has ended)
+                    else if (gameOver && gameOverScreen.style.display === 'flex') {
+                        resetRandomizer();
+                        
+                        // Randomize background when restarting with space key
+                        randomizeBackground();
+                        
+                        // Also simulate clicking the restart button to restart the game
+                        restartButton.click();
+                    }
+                }
+            });
+            
+            function updateDifficulty(difficulty, button) {
+                // Remove selected class from all buttons
+                easyButton.classList.remove('selected');
+                mediumButton.classList.remove('selected');
+                hardButton.classList.remove('selected');
+                
+                // Add selected class to the clicked button
+                button.classList.add('selected');
+                
+                // Update the difficulty info text
+                difficultyInfo.textContent = difficultyDescriptions[difficulty];
+            }
+            
+            function showLoadingPoint(button) {
+                // No need to position relative to buttons anymore
+                
+                // Show the loading point
+                loadingPoint.style.display = 'block';
+                loadingPoint.style.visibility = 'visible';
+                
+                // Add a floating animation effect
+                loadingPoint.style.animation = 'none';
+                setTimeout(() => {
+                    loadingPoint.style.animation = 'float 2s ease-in-out infinite';
+                }, 10);
+                
+                console.log("Loading point should be visible now");
+            }
+            
+            function hideLoadingPoint() {
+                // Hide the loading point
+                loadingPoint.style.display = 'none';
+            }
+            
+            // No need to update position on resize anymore
+            window.removeEventListener('resize', positionLoadingPoint);
+            
+            // Function to randomly select background (50% day, 50% night)
+            function randomizeBackground() {
+                // 50% chance for each background
+                const isNight = Math.random() < 0.5;
+                const backgroundFile = isNight ? 'sprites/background-night.png' : 'sprites/background-day.png';
+                
+                // Dispatch event to change background in game.js
+                window.dispatchEvent(new CustomEvent('changeBackground', {
+                    detail: { 
+                        backgroundFile: backgroundFile,
+                        isNight: isNight
+                    }
+                }));
+                
+                console.log("Background randomized (50/50 chance)");
+            }
         };
     </script>
 </body>
